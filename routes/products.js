@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { pool } from "../db/pool.js";
+import { requireAuth, requireRole } from '../middleware/auth.js';   
 const router = Router();
+const adminOnly = [requireAuth, requireRole('admin')];   
+
 
 function validateProduct(body) {
   const { name, price } = body;
@@ -35,7 +38,7 @@ router.get("/:id", async (req, res) => {
   res.json(rows[0]);
 });
 
-router.post("/", async (req, res) => {
+router.post("/", adminOnly, async (req, res) => {
   const body = req.body || {};
   const error = validateProduct(body);
   if (error) return res.status(400).json({ error });
@@ -51,7 +54,7 @@ router.post("/", async (req, res) => {
 });
 
 // PUT /api/products/5 — заменить товар целиком
-router.put("/:id", async (req, res) => {
+router.put("/:id", adminOnly, async (req, res) => {
   const body = req.body || {};
   const error = validateProduct(body);
   if (error) return res.status(400).json({ error });
@@ -77,7 +80,7 @@ router.put("/:id", async (req, res) => {
   res.json(rows[0]);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", adminOnly, async (req, res) => {
   const { rowCount } = await pool.query("DELETE FROM products WHERE id = $1",[req.params.id]);
   if (rowCount === 0) {
     return res.status(404).json({ error: "Товар не найден" });

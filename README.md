@@ -1,30 +1,16 @@
-# АгроМаркет API
+## Переменные окружения (.env)
+JWT_SECRET      — случайная строка 64 символа (node -e "...randomBytes(32)...")
+JWT_EXPIRES_IN  — срок жизни токена, например 2h
+ADMIN_EMAIL / ADMIN_PASSWORD — администратор, создаётся командой npm run db:init
  
-## Запуск
-1. Установить PostgreSQL, создать базу agromarket
-2. Скопировать .env.example в .env и указать свой пароль
-3. npm install
-4. npm run db:init        # создать таблицы и загрузить товары
-5. npm run dev            # http://localhost:3000
- 
-## Эндпоинты
-| Метод  | Путь                 | Описание                  | Ответы          |
-|--------|----------------------|---------------------------|-----------------|
-| GET    | /api/health          | сервер и связь с БД       | 200             |
-| GET    | /api/products        | товары, ?search=          | 200             |
-| GET    | /api/products/:id    | один товар                | 200, 400, 404   |
-| POST   | /api/products        | создать товар             | 201, 400        |
-| PUT    | /api/products/:id    | изменить товар            | 200, 400, 404   |
-| DELETE | /api/products/:id    | удалить товар             | 204, 404        |
-| GET    | /api/orders          | заявки + название товара  | 200             |
-| POST   | /api/orders          | новая заявка              | 201, 400        |
-| PATCH  | /api/orders/:id      | сменить статус заявки     | 200, 400, 404   |
- 
-Тесты: коллекция postman/agromarket.postman_collection.json
- 
-## Лабораторная 6 — ответы
-- Ошибки из части 2 (price -5, без name, product_id 9999): ...
-- SQL-инъекция: что вернул zzz' OR 1=1 -- и одна кавычка до/после $1: ...
-- Двойная защита quantity (JS-проверка + CHECK): ...
-- Что стало с заявкой после удаления товара: ...
-- Использовал(а) ли ИИ и для чего: ...
+## Эндпоинты (новые и изменённые)
+| Метод  | Путь                 | Доступ  | Ответы             |
+|--------|----------------------|---------|--------------------|
+| POST   | /api/auth/register   | все     | 201, 400, 409      |
+| POST   | /api/auth/login      | все     | 200, 400, 401, 429 |
+| GET    | /api/auth/me         | токен   | 200, 401           |
+| POST   | /api/products        | admin   | 201, 400, 401, 403 |
+| PUT    | /api/products/:id    | admin   | 200, 400, 401, 403, 404 |
+| DELETE | /api/products/:id    | admin   | 204, 401, 403, 404 |
+| GET    | /api/orders          | admin   | 200, 401, 403      |
+| PATCH  | /api/orders/:id      | admin   | 200, 400, 401, 403, 404 |

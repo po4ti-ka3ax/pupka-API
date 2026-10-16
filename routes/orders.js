@@ -1,12 +1,15 @@
 import { Router } from "express";
 import { pool } from '../db/pool.js';
+import { requireAuth, requireRole } from "../middleware/auth.js";
 const router = Router();
+const adminOnly = [requireAuth, requireRole('admin')];   
+
 // Пока храним заявки в памяти: при перезапуске сервера они пропадут.
 // В следующей лабораторной переедем в базу данных.
 const orders = [];
 let nextId = 1;
 // GET /api/orders — список заявок (чтобы проверять результат)
-router.get('/', async (req, res) => {
+router.get('/',adminOnly, async (req, res) => {
   const { rows } = await pool.query(`
     SELECT o.*, p.name AS product_name
     FROM orders o
@@ -41,7 +44,7 @@ router.post('/', async (req, res) => {
 });
 
 // PATCH /api/orders/3   тело: { "status": "processing" }
-router.patch('/:id', async (req, res) => {
+router.patch('/:id',adminOnly, async (req, res) => {
   const { status } = req.body || {};
   if(!status) {
     return res.status(400).json({ error: 'поле status обязательно' });
