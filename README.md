@@ -14,3 +14,4 @@ ADMIN_EMAIL / ADMIN_PASSWORD — администратор, создаётся 
 | DELETE | /api/products/:id    | admin   | 204, 401, 403, 404 |
 | GET    | /api/orders          | admin   | 200, 401, 403      |
 | PATCH  | /api/orders/:id      | admin   | 200, 400, 401, 403, 404 |
+git
