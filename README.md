@@ -33,7 +33,7 @@ All files                     |   73.75 |    53.84 |   77.27 |   75.36 |
   products.js                 |   85.36 |    68.42 |     100 |    92.1 | 13,78,86          
 ------------------------------|---------|----------|---------|---------|-------------------
 
-![CI](https://github.com/po4ti-ka3ax/pupka-API/actions/workflows/ci.yml/badge.svg)
+![CI](git add README.md)
  
 ## Тестирование
 1. Создать базу `agromarket_test` (pgAdmin или psql)
