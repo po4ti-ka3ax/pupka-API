@@ -29,7 +29,7 @@ it('ошибка со свойством status = 400 отдаёт клиент�
     vi.stubEnv('NODE_ENV', 'production'); // Включаем прод-режим
     const res = mockRes();
     const err = new Error('Некорректный формат email');
-    err.status = 400;
+    err.status = 400;пш
     errorHandler(err, { method: 'GET', originalUrl: '/x' }, res, vi.fn());
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json.mock.calls[0][0].error).toBe('Некорректный формат email');
