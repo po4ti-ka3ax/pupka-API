@@ -1,6 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import jwt from "jsonwebtoken";
 import { requireAuth, requireRole } from "../middleware/auth.js";
+import { afterEach } from 'vitest';
+import { errorHandler } from '../middleware/errorHandler.js';
+
 
 // «Поддельный» объект ответа: запоминает, какие методы и с чем вызывали
 function mockRes() {
@@ -9,6 +12,32 @@ function mockRes() {
   res.json = vi.fn(() => res);
   return res;
 }
+
+describe('errorHandler', () => {
+  afterEach(() => vi.unstubAllEnvs());   // вернуть NODE_ENV после каждого теста
+ 
+  it('в продакшене скрывает текст ошибки 500', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const res = mockRes();
+    const err = new Error('connect ECONNREFUSED 10.0.0.5:5432');
+    errorHandler(err, { method: 'GET', originalUrl: '/x' }, res, vi.fn());
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json.mock.calls[0][0].error).toBe('Внутренняя ошибка сервера');
+  });
+ 
+it('ошибка со свойством status = 400 отдаёт клиенту свой текст даже в production', () => {
+    vi.stubEnv('NODE_ENV', 'production'); // Включаем прод-режим
+    const res = mockRes();
+    const err = new Error('Некорректный формат email');
+    err.status = 400;пш
+    errorHandler(err, { method: 'GET', originalUrl: '/x' }, res, vi.fn());
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json.mock.calls[0][0].error).toBe('Некорректный формат email');
+  });
+
+  // ЗАДАНИЕ: ошибка со свойством status = 400 даже в production
+  // ЗАДАНИЕ: отдаёт клиенту свой текст (err.message)
+});
 
 describe("requireRole", () => {
   it("пропускает нужную роль", () => {
