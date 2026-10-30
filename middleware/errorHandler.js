@@ -16,22 +16,22 @@ export function errorHandler(err, req, res, next) {
     error: status >= 500 && isProd ? 'Внутренняя ошибка сервера' : err.message,
   });
 
-  if (PG_CLIENT_ERRORS[err.code]) {
-    return res.status(400).json({
-      error: PG_CLIENT_ERRORS[err.code],
-      detail: err.message,
-    });
-  }
-  if (err.code === "23505") {
-    return res.status(409).json({ error: "Такая запись уже существует" });
-  }
-  if (err.type === "entity.too.large") {
-    return res.status(413).json({ error: "Слишком большой запрос" });
-  }
-  if (err.type === "entity.parse.failed") {
-    return res.status(400).json({ error: "Некорректный JSON в теле запроса" });
-  }
+  // if (PG_CLIENT_ERRORS[err.code]) {
+  //   return res.status(400).json({
+  //     error: PG_CLIENT_ERRORS[err.code],
+  //     detail: err.message,
+  //   });
+  // }
+  // if (err.code === "23505") {
+  //   return res.status(409).json({ error: "Такая запись уже существует" });
+  // }
+  // if (err.type === "entity.too.large") {
+  //   return res.status(413).json({ error: "Слишком большой запрос" });
+  // }
+  // if (err.type === "entity.parse.failed") {
+  //   return res.status(400).json({ error: "Некорректный JSON в теле запроса" });
+  // }
 
-  console.error(err); // полную ошибку видит только разработчик в терминале
-  res.status(500).json({ error: "Внутренняя ошибка сервера" });
+  // console.error(err); // полную ошибку видит только разработчик в терминале
+  // res.status(500).json({ error: "Внутренняя ошибка сервера" });
 }

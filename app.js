@@ -23,8 +23,6 @@ const allowedOrigins = (process.env.CORS_ORIGIN || '')
   .filter(Boolean);
 app.use(cors({ origin: allowedOrigins }));
 
-app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN }));
 app.use(express.json({limit:'10kb'}))
 app.use('/api/auth', authRouter);
 

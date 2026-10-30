@@ -13,8 +13,7 @@ const statements = [
      role          TEXT NOT NULL DEFAULT 'user',
      created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
    )`,
-  `
-    CREATE TABLE IF NOT EXISTS products (
+  `CREATE TABLE IF NOT EXISTS products (
     id         SERIAL PRIMARY KEY,
     name       TEXT    NOT NULL,
     category   TEXT,
@@ -22,8 +21,7 @@ const statements = [
     unit       TEXT    NOT NULL DEFAULT 'кг',
     image      TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    );`
-    
+    )`,
    `CREATE TABLE IF NOT EXISTS orders (
     id            SERIAL PRIMARY KEY,
     product_id    INTEGER REFERENCES products(id) ON DELETE SET NULL,
