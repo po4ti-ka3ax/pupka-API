@@ -7,6 +7,15 @@ const PG_CLIENT_ERRORS = {
 
 // 4 параметра — так Express понимает, что это обработчик ошибок
 export function errorHandler(err, req, res, next) {
+  const status = err.status || err.statusCode || 500;
+  console.error(`[${req.method} ${req.originalUrl}]`, err);   
+
+  const isProd = process.env.NODE_ENV === 'production';
+  res.status(status).json({
+    // наружу: для 5xx в продакшене — только общая фраза
+    error: status >= 500 && isProd ? 'Внутренняя ошибка сервера' : err.message,
+  });
+
   if (PG_CLIENT_ERRORS[err.code]) {
     return res.status(400).json({
       error: PG_CLIENT_ERRORS[err.code],

@@ -11,6 +11,17 @@ import authRouter from './routes/auth.js';
 
 const app = express();
 
+const VERSION = (process.env.RENDER_GIT_COMMIT || 'local').slice(0, 7);
+
+app.set('trust proxy', 1);
+ 
+app.use(helmet());
+
+const allowedOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+app.use(cors({ origin: allowedOrigins }));
 
 app.use(helmet());
 app.use(cors({ origin: process.env.CORS_ORIGIN }));
@@ -28,9 +39,14 @@ if (process.env.NODE_ENV !== 'test') {
 
 // «Жив ли сервер?» — такой маршрут есть почти в каждом API
 app.get('/api/health', async (req, res) => {
-  await pool.query('SELECT 1');
-  res.json({ status: 'ok', db: 'connected', time: new Date().toISOString() });
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', db: 'ok', version: VERSION });
+  } catch (err) {
+    res.status(503).json({ status: 'error', db: 'unavailable', version: VERSION });
+  }
 });
+
 
 
 app.get("/api/about", (req, res) => {
