@@ -38,17 +38,25 @@ router.post("/register", async (req, res) => {
       .json({ error: "Пароль должен быть не короче 8 символов" });
   }
 
-  const passwordHash = await bcrypt.hash(String(password), 10);
+  try {
+    const passwordHash = await bcrypt.hash(String(password), 10);
 
-  const { rows } = await pool.query(
-    `INSERT INTO users (name, email, password_hash)
-     VALUES ($1, $2, $3)
-     RETURNING id, name, email, role, created_at`,
-    [String(name).trim(), String(email).trim().toLowerCase(), passwordHash],
-  );
-  const user = rows[0];
+    const { rows } = await pool.query(
+      `INSERT INTO users (name, email, password_hash)
+       VALUES ($1, $2, $3)
+       RETURNING id, name, email, role, created_at`,
+      [String(name).trim(), String(email).trim().toLowerCase(), passwordHash],
+    );
+    const user = rows[0];
 
-  res.status(201).json({ user, token: createToken(user) });
+    return res.status(201).json({ user, token: createToken(user) });
+  } catch (err) {
+    if (err.code === "23505") {
+      return res.status(409).json({ error: "Email уже зарегистрирован" });
+    }
+    console.error(err);
+    return res.status(500).json({ error: "Внутренняя ошибка сервера" });
+  }
 });
 
 // POST /api/auth/login   { email, password }
