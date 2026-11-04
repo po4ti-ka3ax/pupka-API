@@ -7,7 +7,7 @@ import { logger } from "./middleware/loger.js";
 import { errorHandler } from './middleware/errorHandler.js';
 import { pool } from './db/pool.js';
 import authRouter from './routes/auth.js';   
-
+import categoriesRouter from './routes/categories.js';
 
 const app = express();
 
@@ -16,6 +16,7 @@ const VERSION = (process.env.RENDER_GIT_COMMIT || 'local').slice(0, 7);
 app.set('trust proxy', 1);
  
 app.use(helmet());
+
 
 const allowedOrigins = (process.env.CORS_ORIGIN || '')
   .split(',')
@@ -59,6 +60,7 @@ app.use('/api/orders', ordersRouter)
 app.use((req, res) => {
   res.status(404).json({ error: `Маршрут ${req.method} ${req.originalUrl} не найден` });
 });
+app.use('/api/categories', categoriesRouter);   
 
 app.use(errorHandler);
 
