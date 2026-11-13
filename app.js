@@ -14,7 +14,6 @@ const app = express();
 const VERSION = (process.env.RENDER_GIT_COMMIT || 'local').slice(0, 7);
 
 app.set('trust proxy', 1);
- 
 app.use(helmet());
 
 // Сначала CORS и парсер тела запросов
