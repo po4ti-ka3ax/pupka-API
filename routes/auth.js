@@ -5,6 +5,8 @@ import { pool } from "../db/pool.js";
 import { rateLimit } from "express-rate-limit";
 import { requireAuth, requireRole } from "../middleware/auth.js";
 import { authLimiter } from '../middleware/rateLimit.js';
+import { validate } from "../middleware/validate.js";
+import { loginSchema, registerSchema } from "../validation/schemas.js";
 const router = Router();
 const adminOnly = [requireAuth, requireRole("admin")];
 
@@ -24,7 +26,7 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-router.post("/register", authLimiter, async (req, res) => {
+router.post("/register", authLimiter, validate(registerSchema), async (req, res) => {
   const { name, email, password } = req.body || {};
 
   if (!name || !email || !password) {
@@ -60,7 +62,7 @@ router.post("/register", authLimiter, async (req, res) => {
 });
 
 // POST /api/auth/login   { email, password }
-router.post("/login", authLimiter, async (req, res) => {
+router.post("/login", authLimiter, validate(loginSchema), async (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) {
     return res.status(400).json({ error: "Поля email и password обязательны" });

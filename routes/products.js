@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { pool } from "../db/pool.js";
 import { requireAuth, requireRole } from '../middleware/auth.js';   
+import { productSchema, productUpdateSchema } from "../validation/schemas.js";
+import { idParam } from "../middleware/idParam.js";
+import { validate } from "../middleware/validate.js";
 const router = Router();
 const adminOnly = [requireAuth, requireRole('admin')];   
 
@@ -28,7 +31,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET /api/products/2
-router.get("/:id", async (req, res) => {
+router.get("/:id", idParam, async (req, res) => {
   const { rows } = await pool.query("SELECT * FROM products WHERE id = $1", [
     req.params.id,
   ]);
@@ -38,7 +41,7 @@ router.get("/:id", async (req, res) => {
   res.json(rows[0]);
 });
 
-router.post("/", adminOnly, async (req, res) => {
+router.post("/", requireAuth, requireRole('admin','farmer'), validate(productSchema), async (req, res) => {
   const body = req.body || {};
   const error = validateProduct(body);
   if (error) return res.status(400).json({ error });
@@ -54,7 +57,7 @@ router.post("/", adminOnly, async (req, res) => {
 });
 
 // PUT /api/products/5 — заменить товар целиком
-router.put("/:id", adminOnly, async (req, res) => {
+router.put("/:id", idParam, requireAuth, requireRole('admin', 'farmer'), validate(productUpdateSchema), async (req, res) => {
   const body = req.body || {};
   const error = validateProduct(body);
   if (error) return res.status(400).json({ error });
@@ -80,7 +83,7 @@ router.put("/:id", adminOnly, async (req, res) => {
   res.json(rows[0]);
 });
 
-router.delete("/:id", adminOnly, async (req, res) => {
+router.delete("/:id", idParam, adminOnly, async (req, res) => {
   const { rowCount } = await pool.query("DELETE FROM products WHERE id = $1",[req.params.id]);
   if (rowCount === 0) {
     return res.status(404).json({ error: "Товар не найден" });
